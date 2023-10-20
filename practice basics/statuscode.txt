@@ -1,0 +1,17 @@
+response Status codes
+
+200 - Ok
+
+301 - Resource Moved
+
+404 - Not Found
+
+500- Internal server Error
+
+Ranges :
+
+100 - informational responses
+200 - Success codes
+300 - codes for redirects:
+400 - User or client error codes
+500 - server errors codes
