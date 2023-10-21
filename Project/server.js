@@ -1,8 +1,19 @@
 const http = require("http");
 const fs = require("fs");
+const _ = require("lodash");
 
 const server = http.createServer((req, res) => {
-  console.log(req.url, req.method);
+  //lodash
+  const num = _.random(0, 20);
+  console.log(num);
+
+  const greet = _.once(() => {
+    console.log("Hello");
+  });
+
+  greet();
+  greet();
+  // console.log(req.url, req.method);
   //set header content type
   res.setHeader("Content-Type", "text/html");
   //   res.write("<head> <link rel='stylesheet' href='#'> </head>");
@@ -47,6 +58,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
+//localhost is optional it is set by default
 server.listen(3000, "localhost", () => {
-  console.log("listening to requests");
+  console.log("listening to requests on port 3000");
 });
