@@ -7,13 +7,16 @@ const server = http.createServer((req, res) => {
   const num = _.random(0, 20);
   console.log(num);
 
+  //We can call the function only once
   const greet = _.once(() => {
     console.log("Hello");
   });
 
   greet();
   greet();
+
   // console.log(req.url, req.method);
+
   //set header content type
   res.setHeader("Content-Type", "text/html");
   //   res.write("<head> <link rel='stylesheet' href='#'> </head>");
