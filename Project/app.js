@@ -5,8 +5,8 @@ const path = require("path");
 const mongoose = require("mongoose");
 const { result } = require("lodash");
 const { error } = require("console");
-const Blog = require("./models/blog");
 const { resourceUsage } = require("process");
+const blogRoutes = require("./routes/blogRoutes");
 //express app
 const app = express();
 
@@ -38,6 +38,8 @@ app.set("view engine", "ejs");
 //middleware & static files
 app.use(express.static("public"));
 
+//middleware for forms
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 //mongoose and mongo sandbox routes
@@ -78,7 +80,7 @@ app.use(morgan("dev"));
 //     });
 // });
 
-//Middleware creation : reads from top to bottom
+//Middleware creation : reads from top to bottom : alternative express.Morgan
 
 // app.use((req, res, next) => {
 //   console.log("new request");
@@ -121,21 +123,8 @@ app.get("/about-us", (req, res) => {
   res.redirect("/about");
 });
 
-//blog routes
-
-app.get("/blogs", (req, res) => {
-  Blog.find()
-    .sort({ createdAt: -1 })
-    .then((result) => {
-      res.render("index", { title: "All blogs", blogs: result });
-    })
-    .catch((error) => {
-      console.log("error");
-    });
-});
-app.get("/blogs/create", (req, res) => {
-  res.render("create", { title: "New Blog Section" });
-});
+//We transfered blog routes to another file
+app.use("/blogs", blogRoutes);
 
 //404 not found , it needs to be at the end because if you check a route that exists below it ,it will lunch this first
 app.use((req, res) => {
