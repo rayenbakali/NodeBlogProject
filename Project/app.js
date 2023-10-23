@@ -1,7 +1,29 @@
+const exp = require("constants");
 const express = require("express");
-
+const morgan = require("morgan");
+const path = require("path");
+const mongoose = require("mongoose");
+const { result } = require("lodash");
+const { error } = require("console");
+const Blog = require("./models/blog");
+const { resourceUsage } = require("process");
 //express app
 const app = express();
+
+//call mongo
+const URI = "mongodb://127.0.0.1:27017/nodetut";
+mongoose
+  .connect(URI)
+  .then((result) => {
+    console.log("db connected");
+    app.listen(3000, () => {
+      console.log("server running on 3000");
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+
 //register view engines
 app.set("view engine", "ejs");
 
@@ -9,28 +31,84 @@ app.set("view engine", "ejs");
 // app.set("views", "myviews");
 
 //app listen
-app.listen(3000, () => {
-  console.log("running on 3000");
-});
+// app.listen(3000, () => {
+//   console.log("running on 3000");
+// });
 
+//middleware & static files
+app.use(express.static("public"));
+
+app.use(morgan("dev"));
+
+//mongoose and mongo sandbox routes
+
+// app.get("/add-blog", (req, res) => {
+//   const blog = new Blog({
+//     title: "new blog2",
+//     snippet: "about new blog",
+//     body: "more about new blog",
+//   });
+//   blog
+//     .save()
+//     .then((result) => {
+//       res.send(result);
+//     })
+//     .catch((error) => {
+//       console.log("error");
+//     });
+// });
+
+// app.get("/all-blogs", (req, res) => {
+//   Blog.find()
+//     .then((result) => {
+//       res.send(result);
+//     })
+//     .catch((error) => {
+//       console.log("error");
+//     });
+// });
+
+// app.get("/findblog", (req, res) => {
+//   Blog.findById("6535d2143bad017ad7952693")
+//     .then((result) => {
+//       res.send(result);
+//     })
+//     .catch((error) => {
+//       console.log("error");
+//     });
+// });
+
+//Middleware creation : reads from top to bottom
+
+// app.use((req, res, next) => {
+//   console.log("new request");
+//   console.log("host:", req.hostname);
+//   console.log("host:", req.path);
+//   console.log("method:", req.method);
+//   //fire the next function
+//   next();
+// });
+
+//routes
 app.get("/", (req, res) => {
-  const blogs = [
-    {
-      title: "Yoshi finds eggs",
-      snippet: "Lorem ipsum dolor sit amet consectetur",
-    },
-    {
-      title: "Mario finds stars",
-      snippet: "Lorem ipsum dolor sit amet consectetur",
-    },
-    {
-      title: "How to defeat bowser",
-      snippet: "Lorem ipsum dolor sit amet consectetur",
-    },
-  ];
-  //res.send("<h1>salem</h1>");
-  // res.sendFile("./views/index.html", { root: __dirname });
-  res.render("index", { title: "Home", blogs });
+  // const blogs = [
+  //   {
+  //     title: "Yoshi finds eggs",
+  //     snippet: "Lorem ipsum dolor sit amet consectetur",
+  //   },
+  //   {
+  //     title: "Mario finds stars",
+  //     snippet: "Lorem ipsum dolor sit amet consectetur",
+  //   },
+  //   {
+  //     title: "How to defeat bowser",
+  //     snippet: "Lorem ipsum dolor sit amet consectetur",
+  //   },
+  // ];
+  // //res.send("<h1>salem</h1>");
+  // // res.sendFile("./views/index.html", { root: __dirname });
+  // res.render("index", { title: "Home", blogs });
+  res.redirect("/blogs");
 });
 
 app.get("/about", (req, res) => {
@@ -43,6 +121,18 @@ app.get("/about-us", (req, res) => {
   res.redirect("/about");
 });
 
+//blog routes
+
+app.get("/blogs", (req, res) => {
+  Blog.find()
+    .sort({ createdAt: -1 })
+    .then((result) => {
+      res.render("index", { title: "All blogs", blogs: result });
+    })
+    .catch((error) => {
+      console.log("error");
+    });
+});
 app.get("/blogs/create", (req, res) => {
   res.render("create", { title: "New Blog Section" });
 });
